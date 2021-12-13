@@ -5,46 +5,55 @@ using UnityEngine;
 namespace JacDev.Fix
 {
     public class playermovement : MonoBehaviour
-{
-    public static Transform player;
-    public float moveSpeed = 3f;
-
-    public Rigidbody2D rb;
-    public Animator animator;
-
-    Vector2 movement;
-
-    // Start is called before the first frame update
-    void Start()
     {
-        player = transform;
-    }
+        public static Transform player;
+        public float moveSpeed = 3f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        public Rigidbody2D rb;
+        public Animator animator;
 
-        animator.SetFloat("Horizontal", movement.x);
-        animator.SetFloat("Vertical", movement.y);
-        animator.SetFloat("Speed", movement.sqrMagnitude);
+        Vector2 movement;
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        public GameObject shiftingCol, standCol;
+
+        // Start is called before the first frame update
+        void Start()
         {
-            animator.SetBool("Shifting",true);
-            animator.SetTrigger("Shift");
+            player = transform;
         }
-        if(Input.GetKeyUp(KeyCode.LeftControl)){
-             animator.SetBool("Shifting",false);
+
+        // Update is called once per frame
+        void Update()
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
+
+            animator.SetFloat("Horizontal", movement.x);
+            animator.SetFloat("Vertical", movement.y);
+            animator.SetFloat("Speed", movement.sqrMagnitude);
+
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {
+                animator.SetBool("Shifting", true);
+                animator.SetTrigger("Shift");
+
+                standCol.SetActive(false);
+                shiftingCol.SetActive(true);
+            }
+            if (Input.GetKeyUp(KeyCode.LeftControl))
+            {
+                animator.SetBool("Shifting", false);
+
+                standCol.SetActive(true);
+                shiftingCol.SetActive(false);
+            }
         }
-    }
 
-    private void FixedUpdate()
-    {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-    }
+        private void FixedUpdate()
+        {
+            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        }
 
-}
+    }
 
 }

@@ -42,6 +42,8 @@ public class FieldOfView : MonoBehaviour
     public MeshFilter viewMeshFilter;
     Mesh viewMesh;
 
+    float warningValue = 0;
+
     void Start()
     {
         transform.position = waypoints[waypointIndex].transform.position;
@@ -54,11 +56,13 @@ public class FieldOfView : MonoBehaviour
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
 
-        StartCoroutine("FindTargetsWithDelay",2f);
+        // StartCoroutine(FindTargetsWithDelay(2f));
     }
 
     private void Update()
     {
+        FindVisibleTargets();
+        CheckLookingPlayer();
         if (!waiting)
             Move();
         if (Vector2.Distance(transform.position, player.transform.position) < 0.35)
@@ -66,54 +70,78 @@ public class FieldOfView : MonoBehaviour
             Application.LoadLevel("Caught");
         }
     }
+
     private void Move()
-    { 
+    {
+        agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+        print($"可見：{visibleTargets.Count}  警戒值：{ warningValue }");
+        if (warningValue >= .9f)
         {
-            if (visibleTargets.Count > 0)
+            GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
+
+            agent.speed = 2;
+            agent.SetDestination(player.transform.position);
+
+            deltaSpeed = agent.desiredVelocity;
+        }
+        else
+        {
+            agent.SetDestination(waypoints[waypointIndex].transform.position);
+
+            deltaSpeed = Vector2.MoveTowards(transform.position,
+                waypoints[waypointIndex].transform.position,
+               moveSpeed * Time.deltaTime) - (Vector2)transform.position;
+
+            transform.position = Vector2.MoveTowards(transform.position,
+                waypoints[waypointIndex].transform.position,
+               moveSpeed * Time.deltaTime);
+
+            if ((transform.localPosition - waypoints[waypointIndex].transform.localPosition).magnitude <= .0001f)
             {
-                // transform.position = targett.position;
-                GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
-                
-                agent = GetComponent<NavMeshAgent>();
-                agent.updateRotation = false;
-                agent.updateUpAxis = false;
-                agent.speed = 2;
-                agent.SetDestination(player.transform.position);
-                
-
-            }
-            else if (waypointIndex <= waypoints.Length - 1)
-            {
-
-             
-                agent = GetComponent<NavMeshAgent>();
-                agent.updateRotation = false;
-                agent.updateUpAxis = false;
-                agent.SetDestination(waypoints[waypointIndex].transform.position);
-             
-                deltaSpeed = Vector2.MoveTowards(transform.position,
-                    waypoints[waypointIndex].transform.position,
-                   moveSpeed * Time.deltaTime) - (Vector2)transform.position;
-  
-                transform.position = Vector2.MoveTowards(transform.position,
-                    waypoints[waypointIndex].transform.position,
-                   moveSpeed * Time.deltaTime);
-
-
-           
-                if ((transform.position - waypoints[waypointIndex].transform.position).magnitude <= .01f)
-                {
+                deltaSpeed = new Vector2(-Mathf.Sin(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z), Mathf.Cos(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z));
+                if (!waiting)
                     StartCoroutine(Delay());
-                }
-            
             }
+        }
+
+    }
+
+    void CheckLookingPlayer()
+    {
+        if (visibleTargets.Count > 0)
+        {
+            warningValue = Mathf.Clamp01(warningValue += 1f * Time.deltaTime);
+        }
+        else
+        {
+            warningValue = Mathf.Clamp01(warningValue -= 1f * Time.deltaTime);
+        }
+
+        if (transform.Find("Warning Bar") != null)
+        {
+            UnityEngine.UI.Image bar = transform.Find("Warning Bar").GetComponentInChildren<UnityEngine.UI.Image>();
+            bar.fillAmount = warningValue;
         }
     }
 
     IEnumerator Delay()
     {
         waiting = true;
-        yield return new WaitForSeconds(delay);
+        float t = 0f;
+        while (t < delay && warningValue < .9f)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        waiting = false;
+        if (warningValue >= .9f)
+        {
+            yield break;
+        }
+
         if (waypointIndex == waypoints.Length - 1)
         {
             waypointIndex = 0;
@@ -121,16 +149,6 @@ public class FieldOfView : MonoBehaviour
         else
         {
             waypointIndex++;
-        }
-        waiting = false;
-    }
-
-    IEnumerator FindTargetsWithDelay(float delay)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(delay);
-            FindVisibleTargets();
         }
     }
 
@@ -147,13 +165,10 @@ public class FieldOfView : MonoBehaviour
 
     void FindVisibleTargets()
     {
-     
+
         if (visibleTargets.Count > 0)
         {
-          
             GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
-          
-
         }
         else
         {
@@ -172,18 +187,14 @@ public class FieldOfView : MonoBehaviour
             float angle = GetAngle(new Vector3(transform.forward.x, transform.forward.y, 0), dirToTarget);
             angle += angle > 0 ? -180 : 180;
             angle += offset;
-            // print(angle);
 
             if (Mathf.Abs(angle) < viewAngle / 2)
             {
                 float dstToTarget = Vector3.Distance(transform.position, target.position);
                 if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
                 {
-                 
                     visibleTargets.Add(target);
-             
                 }
-          
             }
         }
     }
