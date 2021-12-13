@@ -57,7 +57,6 @@ public class FieldOfView : MonoBehaviour
         StartCoroutine("FindTargetsWithDelay",2f);
     }
 
-    [System.Obsolete]
     private void Update()
     {
         if (!waiting)
