@@ -42,7 +42,10 @@ public class FieldOfView : MonoBehaviour
     public MeshFilter viewMeshFilter;
     Mesh viewMesh;
 
-    float warningValue = 0;
+    public float maxTracingTime, minTracingTime;
+    bool isTracing;
+
+    public float warningValue = 0;
 
     void Start()
     {
@@ -57,14 +60,15 @@ public class FieldOfView : MonoBehaviour
         viewMeshFilter.mesh = viewMesh;
 
         // StartCoroutine(FindTargetsWithDelay(2f));
+        StartCoroutine(Movement());
     }
 
     private void Update()
     {
         FindVisibleTargets();
         CheckLookingPlayer();
-        if (!waiting)
-            Move();
+        // if (!waiting)
+        //     Move();
         if (Vector2.Distance(transform.position, player.transform.position) < 0.35)
         {
             Application.LoadLevel("Caught");
@@ -73,12 +77,10 @@ public class FieldOfView : MonoBehaviour
 
     private void Move()
     {
-        agent = GetComponent<NavMeshAgent>();
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
         print($"可見：{visibleTargets.Count}  警戒值：{ warningValue }");
         if (warningValue >= .9f)
         {
+            isTracing = true;
             GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
 
             agent.speed = 2;
@@ -89,23 +91,92 @@ public class FieldOfView : MonoBehaviour
         else
         {
             agent.SetDestination(waypoints[waypointIndex].transform.position);
+            Vector2 currentPoint = waypoints[waypointIndex].transform.position;
 
             deltaSpeed = Vector2.MoveTowards(transform.position,
-                waypoints[waypointIndex].transform.position,
+               currentPoint,
                moveSpeed * Time.deltaTime) - (Vector2)transform.position;
 
             transform.position = Vector2.MoveTowards(transform.position,
-                waypoints[waypointIndex].transform.position,
+                currentPoint,
                moveSpeed * Time.deltaTime);
 
             if ((transform.localPosition - waypoints[waypointIndex].transform.localPosition).magnitude <= .0001f)
             {
                 deltaSpeed = new Vector2(-Mathf.Sin(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z), Mathf.Cos(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z));
-                if (!waiting)
-                    StartCoroutine(Delay());
+                StartCoroutine(Delay());
             }
         }
 
+    }
+
+    IEnumerator Movement()
+    {
+        float waitTime = 0;
+        while (true)
+        {
+            if (warningValue >= .9f && !isTracing)
+                yield return StartCoroutine(Tracing());
+
+            if (!waiting)
+            {
+                agent.SetDestination(waypoints[waypointIndex].transform.position);
+                Vector2 currentPoint = waypoints[waypointIndex].transform.position;
+
+                deltaSpeed = Vector2.MoveTowards(transform.position,
+                   currentPoint,
+                   moveSpeed * Time.deltaTime) - (Vector2)transform.position;
+
+                transform.position = Vector2.MoveTowards(transform.position,
+                    currentPoint,
+                   moveSpeed * Time.deltaTime);
+
+                if ((transform.localPosition - waypoints[waypointIndex].transform.localPosition).magnitude <= .0001f)
+                {
+                    deltaSpeed = new Vector2(-Mathf.Sin(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z), Mathf.Cos(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z));
+                    waiting = true;
+                }
+            }
+            else
+            {
+                if (waitTime < delay)
+                {
+                    waitTime += Time.deltaTime;
+                }
+                else
+                {
+                    waypointIndex = waypointIndex >= waypoints.Length - 1 ? 0 : waypointIndex + 1;
+                    waiting = false;
+                    waitTime = 0;
+                }
+
+            }
+
+            yield return null;
+        }
+    }
+
+    IEnumerator Tracing()
+    {
+        isTracing = true;
+        do
+        {
+            float time = Random.Range(minTracingTime, maxTracingTime);
+            float t = 0;
+            while (time > t)
+            {
+                GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
+
+                agent.speed = 2;
+                agent.SetDestination(player.transform.position);
+
+                deltaSpeed = agent.desiredVelocity;
+
+                t += Time.deltaTime;
+                yield return null;
+            }
+        } while (warningValue >= .95f);
+        isTracing = false;
     }
 
     void CheckLookingPlayer()
@@ -116,7 +187,7 @@ public class FieldOfView : MonoBehaviour
         }
         else
         {
-            warningValue = Mathf.Clamp01(warningValue -= 1f * Time.deltaTime);
+            warningValue = Mathf.Clamp01(warningValue -= .5f * Time.deltaTime);
         }
 
         if (transform.Find("Warning Bar") != null)
