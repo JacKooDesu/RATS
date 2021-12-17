@@ -37,7 +37,7 @@ public class GameSettingHandler : MonoBehaviour
 
     public static void SetResolution(int index, bool fullScreen)
     {
-        Screen.SetResolution(resolutionSettings[index].size.x, resolutionSettings[index].size.y, fullScreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+        Screen.SetResolution(resolutionSettings[index].size.x, resolutionSettings[index].size.y, fullScreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
         isFullScreen = fullScreen;
         currentResolution = resolutionSettings[index].size;
 
@@ -47,7 +47,7 @@ public class GameSettingHandler : MonoBehaviour
 
     public static void SetResolution(Vector2Int size, bool fullScreen)
     {
-        Screen.SetResolution(size.x, size.y, fullScreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+        Screen.SetResolution(size.x, size.y, fullScreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
         isFullScreen = fullScreen;
         currentResolution = size;
 
