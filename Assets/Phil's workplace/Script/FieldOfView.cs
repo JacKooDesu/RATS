@@ -47,6 +47,18 @@ public class FieldOfView : MonoBehaviour
 
     public float warningValue = 0;
 
+    Animator animator;
+    enum AnimationState
+    {
+        Empty = 0,
+        RightIdle = 1,
+        RightWalking = 2,
+        LeftIdle = 3,
+        LeftWalking = 4
+    }
+    AnimationState animationState;
+    AnimationState animationStateLast;
+
     void Start()
     {
         transform.position = waypoints[waypointIndex].transform.position;
@@ -59,6 +71,7 @@ public class FieldOfView : MonoBehaviour
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
 
+        animator = GetComponentInChildren<Animator>();
         // StartCoroutine(FindTargetsWithDelay(2f));
         StartCoroutine(Movement());
     }
@@ -72,6 +85,13 @@ public class FieldOfView : MonoBehaviour
         if (Vector2.Distance(transform.position, player.transform.position) < 0.35)
         {
             Application.LoadLevel("Caught");
+        }
+
+        if (animationStateLast != animationState)
+        {
+            animator.SetInteger("State", (int)animationState);
+            animator.SetTrigger("ChangeState");
+            animationStateLast = animationState;
         }
     }
 
@@ -136,6 +156,23 @@ public class FieldOfView : MonoBehaviour
                     deltaSpeed = new Vector2(-Mathf.Sin(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z), Mathf.Cos(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z));
                     waiting = true;
                 }
+
+                // animtion setup
+                if (waiting)
+                {
+                    if (deltaSpeed.x > 0)
+                        animationState = AnimationState.RightIdle;
+                    else
+                        animationState = AnimationState.LeftIdle;
+                }
+                else
+                {
+                    if (deltaSpeed.x > 0)
+                        animationState = AnimationState.RightWalking;
+                    else
+                        animationState = AnimationState.LeftWalking;
+                }
+
             }
             else
             {
@@ -171,6 +208,11 @@ public class FieldOfView : MonoBehaviour
                 agent.SetDestination(player.transform.position);
 
                 deltaSpeed = agent.desiredVelocity;
+
+                if (deltaSpeed.x > 0)
+                    animationState = AnimationState.RightWalking;
+                else
+                    animationState = AnimationState.LeftWalking;
 
                 t += Time.deltaTime;
                 yield return null;
