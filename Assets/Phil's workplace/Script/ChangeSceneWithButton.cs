@@ -6,8 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class ChangeSceneWithButton : MonoBehaviour
 {
+    
     [SerializeField] private Transform player; //drag player reference onto here
-    private Vector3 targetPosition = new Vector3(-18, -6, 0); //here you store the position you want to teleport your player to
+    private Vector3 targetPosition = new Vector3(-17, -7, 0); //here you store the position you want to teleport your player to
 
 
     public void LoadScene(string screneName)
@@ -16,7 +17,7 @@ public class ChangeSceneWithButton : MonoBehaviour
     }
     private void OnEnable()
     {
-      
+
         SceneManager.sceneLoaded += SceneLoaded; //You add your method to the delegate
 
     }
@@ -32,12 +33,12 @@ public class ChangeSceneWithButton : MonoBehaviour
     private void SceneLoaded(Scene scene, LoadSceneMode mode)
     {
         print("love");
-        if (scene.name == "Factory") //use your desired check here to compare your scene
+        if (scene.name == "FactoryFix") //use your desired check here to compare your scene
         {
-           
+
             if (player == null)
                 player = FindObjectOfType<JacDev.Fix.playermovement>().transform;
-       
+
             player.position = targetPosition;
             SceneManager.sceneLoaded -= SceneLoaded;
         }
@@ -48,7 +49,6 @@ public class ChangeSceneWithButton : MonoBehaviour
         {
             Application.Quit();
         }
+     
     }
 }
-
-

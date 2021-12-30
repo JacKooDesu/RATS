@@ -47,6 +47,18 @@ public class FieldOfView : MonoBehaviour
 
     public float warningValue = 0;
 
+    Animator animator;
+    enum AnimationState
+    {
+        Empty = 0,
+        RightIdle = 1,
+        RightWalking = 2,
+        LeftIdle = 3,
+        LeftWalking = 4
+    }
+    AnimationState animationState;
+    AnimationState animationStateLast;
+
     void Start()
     {
         transform.position = waypoints[waypointIndex].transform.position;
@@ -59,6 +71,7 @@ public class FieldOfView : MonoBehaviour
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
 
+        animator = GetComponentInChildren<Animator>();
         // StartCoroutine(FindTargetsWithDelay(2f));
         StartCoroutine(Movement());
     }
@@ -73,6 +86,13 @@ public class FieldOfView : MonoBehaviour
         {
             Application.LoadLevel("Caught");
         }
+
+        if (animationStateLast != animationState)
+        {
+            animator.SetInteger("State", (int)animationState);
+            animator.SetTrigger("ChangeState");
+            animationStateLast = animationState;
+        }
     }
 
     private void Move()
@@ -83,7 +103,7 @@ public class FieldOfView : MonoBehaviour
             isTracing = true;
             GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
 
-            agent.speed = 2;
+            agent.speed = 1;
             agent.SetDestination(player.transform.position);
 
             deltaSpeed = agent.desiredVelocity;
@@ -136,6 +156,23 @@ public class FieldOfView : MonoBehaviour
                     deltaSpeed = new Vector2(-Mathf.Sin(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z), Mathf.Cos(Mathf.Deg2Rad * waypoints[waypointIndex].localEulerAngles.z));
                     waiting = true;
                 }
+
+                // animtion setup
+                if (waiting)
+                {
+                    if (deltaSpeed.x > 0)
+                        animationState = AnimationState.RightIdle;
+                    else
+                        animationState = AnimationState.LeftIdle;
+                }
+                else
+                {
+                    if (deltaSpeed.x > 0)
+                        animationState = AnimationState.RightWalking;
+                    else
+                        animationState = AnimationState.LeftWalking;
+                }
+
             }
             else
             {
@@ -167,10 +204,15 @@ public class FieldOfView : MonoBehaviour
             {
                 GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
 
-                agent.speed = 2;
+                agent.speed = 1.5f; //1225
                 agent.SetDestination(player.transform.position);
 
                 deltaSpeed = agent.desiredVelocity;
+
+                if (deltaSpeed.x > 0)
+                    animationState = AnimationState.RightWalking;
+                else
+                    animationState = AnimationState.LeftWalking;
 
                 t += Time.deltaTime;
                 yield return null;
