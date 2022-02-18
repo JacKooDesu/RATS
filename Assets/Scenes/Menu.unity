@@ -3450,12 +3450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8a4f2930e52ca4c93f1b2a1d367bae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pausePanel: {fileID: 1183417618}
---- !u!1 &1183417618 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 249334811818963957, guid: 93f6c9297b18dc7419edd0278ac3980c, type: 3}
-  m_PrefabInstance: {fileID: 249334812984358631}
-  m_PrefabAsset: {fileID: 0}
+  pausePanel: {fileID: 249334812984358632}
 --- !u!224 &1183417619 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 249334811818963956, guid: 93f6c9297b18dc7419edd0278ac3980c, type: 3}
@@ -4423,3 +4418,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93f6c9297b18dc7419edd0278ac3980c, type: 3}
+--- !u!114 &249334812984358632 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1320729805923712803, guid: 93f6c9297b18dc7419edd0278ac3980c, type: 3}
+  m_PrefabInstance: {fileID: 249334812984358631}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4696fab3e04776147b134a0de8998c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
