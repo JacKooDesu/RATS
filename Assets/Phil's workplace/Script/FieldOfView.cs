@@ -103,7 +103,7 @@ public class FieldOfView : MonoBehaviour
             isTracing = true;
             GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
 
-            agent.speed = 2;
+            agent.speed = 1;
             agent.SetDestination(player.transform.position);
 
             deltaSpeed = agent.desiredVelocity;
@@ -204,7 +204,7 @@ public class FieldOfView : MonoBehaviour
             {
                 GetComponentInChildren<MeshRenderer>().material.color = new Color(1, 0, 1, .5f);
 
-                agent.speed = 2;
+                agent.speed = 1.5f; //1225
                 agent.SetDestination(player.transform.position);
 
                 deltaSpeed = agent.desiredVelocity;

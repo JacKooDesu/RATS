@@ -13,6 +13,10 @@ public class MenuQuit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
+    }
+    public void exit()
+    {
         Application.Quit();
     }
 }

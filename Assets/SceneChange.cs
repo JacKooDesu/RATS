@@ -7,7 +7,7 @@ public class SceneChange : MonoBehaviour
 {
     public void NextScene()
     {
-        SceneManager.LoadScene("Factory");
+        SceneManager.LoadScene("Restaurant");
     }
 
 }
