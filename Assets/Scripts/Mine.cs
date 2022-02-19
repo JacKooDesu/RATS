@@ -8,7 +8,7 @@ public class Mine : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.GetComponent<JacDev.Fix.playermovement>())
+        if (other.gameObject.GetComponent<JacDev.Fix.PlayerMovement>())
         {
             BombTriggered();
             gameObject.SetActive(false);

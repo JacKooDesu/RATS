@@ -37,7 +37,7 @@ public class ChangeSceneWithButton : MonoBehaviour
         {
 
             if (player == null)
-                player = FindObjectOfType<JacDev.Fix.playermovement>().transform;
+                player = FindObjectOfType<JacDev.Fix.PlayerMovement>().transform;
 
             player.position = targetPosition;
             SceneManager.sceneLoaded -= SceneLoaded;
