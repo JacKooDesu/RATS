@@ -19,6 +19,7 @@ namespace JacDev.Fix
 
         [Header("無人機設定")]
         public KeyCode droneActiveKey = KeyCode.E;
+        public KeyCode hackActionKey = KeyCode.F;
         public GameObject dronePrefab = default;
         public GameObject currentDrone = default;
         public float droneMoveForce = 10f;
@@ -44,8 +45,31 @@ namespace JacDev.Fix
             }
             else    // 後續新增無人機動畫，此處需重新寫過
             {
+                animator.SetFloat("Horizontal", 0);
+                animator.SetFloat("Vertical", 0);
+                animator.SetFloat("Speed", 0);
+
                 if (currentDrone != null)
-                    currentDrone.transform.eulerAngles = Vector3.up * (movement.x > 0 ? 0 : 180);
+                    currentDrone.transform.eulerAngles = Vector3.up * (currentDrone.GetComponent<Rigidbody2D>().velocity.x > 0 ? 0 : 180);
+
+                if (Input.GetKeyDown(hackActionKey))
+                {
+                    var hits = Physics2D.CapsuleCastAll(
+                                            currentDrone.transform.position,
+                                            Vector2.one * .15f,
+                                            CapsuleDirection2D.Vertical,
+                                            360f,
+                                            Vector2.up);
+
+                    if (hits.Length > 0)
+                    {
+                        foreach (var h in hits)
+                        {
+                            if (h.transform.GetComponent<HackingSpotBase>() != null)
+                                h.transform.GetComponent<HackingSpotBase>().Hack();
+                        }
+                    }
+                }
             }
 
 
@@ -86,7 +110,8 @@ namespace JacDev.Fix
                 return;
             }
 
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+            if (!isUsingDrone)
+                rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
         }
 
     }
