@@ -106,7 +106,9 @@ namespace JacDev.Fix
             if (currentDrone != null && isUsingDrone)
             {
                 var dRb = currentDrone.GetComponent<Rigidbody2D>();
-                dRb.AddForce(movement * droneMoveForce * Time.fixedDeltaTime);
+                // 不再使用，飛行無人機改為爬行無人機
+                // dRb.AddForce(movement * droneMoveForce * Time.fixedDeltaTime);
+                dRb.MovePosition(dRb.position + movement * moveSpeed * Time.fixedDeltaTime);
                 return;
             }
 
