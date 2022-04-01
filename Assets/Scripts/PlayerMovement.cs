@@ -19,6 +19,7 @@ namespace JacDev.Fix
 
         [Header("無人機設定")]
         public KeyCode droneActiveKey = KeyCode.E;
+        public KeyCode droneRecallKey = KeyCode.Q;
         public KeyCode hackActionKey = KeyCode.F;
         public GameObject dronePrefab = default;
         public GameObject currentDrone = default;
@@ -42,6 +43,25 @@ namespace JacDev.Fix
                 animator.SetFloat("Horizontal", movement.x);
                 animator.SetFloat("Vertical", movement.y);
                 animator.SetFloat("Speed", movement.sqrMagnitude);
+
+                if (Input.GetKeyDown(hackActionKey))
+                {
+                    var hits = Physics2D.CapsuleCastAll(
+                                            transform.position,
+                                            Vector2.one * .15f,
+                                            CapsuleDirection2D.Vertical,
+                                            360f,
+                                            Vector2.up);
+
+                    if (hits.Length > 0)
+                    {
+                        foreach (var h in hits)
+                        {
+                            if (h.transform.GetComponent<HackingSpotBase>() != null)
+                                h.transform.GetComponent<HackingSpotBase>().Hack(HackingSpotBase.HackSpotType.Player);
+                        }
+                    }
+                }
             }
             else    // 後續新增無人機動畫，此處需重新寫過
             {
@@ -66,7 +86,7 @@ namespace JacDev.Fix
                         foreach (var h in hits)
                         {
                             if (h.transform.GetComponent<HackingSpotBase>() != null)
-                                h.transform.GetComponent<HackingSpotBase>().Hack();
+                                h.transform.GetComponent<HackingSpotBase>().Hack(HackingSpotBase.HackSpotType.Drone);
                         }
                     }
                 }
@@ -93,9 +113,22 @@ namespace JacDev.Fix
             {
                 isUsingDrone = !isUsingDrone;
                 if (currentDrone == null)
-                {
                     currentDrone = Instantiate(dronePrefab, transform.position, Quaternion.identity);
-                }
+                else if (!currentDrone.activeInHierarchy)
+                    currentDrone.transform.position = transform.position;
+
+                currentDrone.SetActive(true);
+
+                FindObjectOfType<Cinemachine.CinemachineVirtualCamera>().Follow = isUsingDrone ? currentDrone.transform : transform;
+            }
+
+            if (Input.GetKeyDown(droneRecallKey))
+            {
+                if (currentDrone == null)
+                    return;
+
+                isUsingDrone = false;
+                currentDrone.SetActive(false);
 
                 FindObjectOfType<Cinemachine.CinemachineVirtualCamera>().Follow = isUsingDrone ? currentDrone.transform : transform;
             }
