@@ -2192,7 +2192,6 @@ GameObject:
   - component: {fileID: 949832008}
   - component: {fileID: 949832007}
   - component: {fileID: 949832006}
-  - component: {fileID: 949832009}
   m_Layer: 5
   m_Name: "\u958B\u59CB\u904A\u6232"
   m_TagString: Untagged
@@ -2264,15 +2263,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1980466224}
-        m_TargetAssemblyTypeName: SceneChange, Assembly-CSharp
-        m_MethodName: NextScene
-        m_Mode: 1
+        m_TargetAssemblyTypeName: SceneUtil, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Restaurant
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &949832007
@@ -2313,18 +2312,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 949832004}
   m_CullTransparentMesh: 1
---- !u!114 &949832009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 949832004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7f71a523db58d42ae05c2d53c26332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &951422523
 GameObject:
   m_ObjectHideFlags: 0
@@ -4057,7 +4044,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1980466223}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7f71a523db58d42ae05c2d53c26332, type: 3}
+  m_Script: {fileID: 11500000, guid: 324644efbad1c4d4f95483f13e2c65dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1980466225

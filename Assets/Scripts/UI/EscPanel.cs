@@ -12,7 +12,7 @@ public class EscPanel : MonoBehaviour
         mainMenuBtn.onClick.RemoveAllListeners();
         leaveBtn.onClick.RemoveAllListeners();
 
-        // mainMenuBtn.onClick.AddListener()
+        mainMenuBtn.onClick.AddListener(() => SceneUtil.Singleton.ChangeScene("Menu"));
         leaveBtn.onClick.AddListener(() => { print("QUIT"); Application.Quit(); });
     }
 
